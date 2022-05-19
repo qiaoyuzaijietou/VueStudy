@@ -1,132 +1,43 @@
 <template>
-  <div id="root">
-    <div class="todo-container">
-      <div class="todo-wrap">
-        <MyHeader @addTodo="addTodo" />
-        <MyList :todos="todos" />
-        <MyFooter :todos="todos" @checkAllTodo="checkAllTodo" @clearAllTodo="clearAllTodo" />
-      </div>
-    </div>
+  <div class="container">
+    <Category title="美食">
+      <img src="../public/food.webp" />
+    </Category>
+    <Category title="游戏">
+      <ul v-show="title !== '美食'">
+        <li v-for="(g, index) in games" :key="index">{{ g }}</li>
+      </ul>
+    </Category>
+    <Category title="电影">
+      <video controls src="../public/film.mp4"></video>
+    </Category>
   </div>
 </template>
 <script>
-import pubsub from 'pubsub-js'
-import MyHeader from "./components/MyHeader";
-import MyList from "./components/MyList";
-import MyFooter from "./components/MyFooter";
-// 引入School组件
+import Category from "./components/Category.vue";
 export default {
   name: "App",
+  components: {
+    Category,
+  },
   data() {
     return {
-      todos: JSON.parse(localStorage.getItem('todos')) || []
+      foods: ["火锅", "烧烤", "小龙虾", "牛排"],
+      games: ["红色警戒", "穿越火线", "劲舞团", "超级玛丽"],
+      films: ["《教父》", "《拆弹专家》", "《你好，李焕英》", "《尚硅谷》"],
     };
   },
-  methods: {
-    // 添加一个todo
-    addTodo(todoObj) {
-      this.todos.unshift(todoObj);
-    },
-    // 勾选or取消勾选一个todo
-    checkTodo(id) {
-      this.todos.forEach((todo) => {
-        if (todo.id === id) todo.done = !todo.done;
-      });
-    },
-    // 更新一个todo
-    updateTodo(id,title) {
-      this.todos.forEach((todo) => {
-        if (todo.id === id) todo.title = title;
-      });
-    },
-    // 删除一个todo
-    deleteTodo(_,id) {
-      this.todos = this.todos.filter((todo) => {
-        return todo.id !==id
-      })
-    },
-    // 全选or取消勾选
-    checkAllTodo(done){
-      this.todos.forEach((todo) => {
-        todo.done = done
-      })
-    },
-    // 清除所有已经完成的todo
-    clearAllTodo(){
-      this.todos = this.todos.filter((todo) => {
-        return ! todo.done
-      })
-    }
-  },
-  watch:{
-    todos:{
-      deep:true,
-      handler(value){
-        localStorage.setItem('todos',JSON.stringify(value))
-      }
-    }
-  },
-  components: { MyHeader, MyList, MyFooter },
-  mounted(){
-    this.$bus.$on('checkTodo',this.checkTodo)
-    this.$bus.$on('updateTodo',this.updateTodo)
-    this.pubId = pubsub.subscribe('deleteTodo',this.deleteTodo)
-  },
-  beforeDestroy(){
-    this.$bus.$off('checkTodo')
-    this.$bus.$off('updateTodo')
-    pubsub.unsubscribe(this.pubId)
-  }
 };
 </script>
-<style>
-/*base*/
-body {
-  background: #fff;
+<style scoped>
+.container {
+  display: flex;
+  justify-content: space-evenly;
 }
-
-.btn {
-  display: inline-block;
-  padding: 4px 12px;
-  margin-bottom: 0;
-  font-size: 14px;
-  line-height: 20px;
-  text-align: center;
-  vertical-align: middle;
-  cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 1px 2px rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
+img{
+    width: 100%;
 }
-
-.btn-danger {
-  color: #fff;
-  background-color: #da4f49;
-  border: 1px solid #bd362f;
-}
-
-.btn-danger:hover {
-  color: #fff;
-  background-color: #bd362f;
-}
-.btn-edit {
-  color: #fff;
-  background-color: skyblue;
-  border: 1px solid rgb(6, 69, 94);
-  margin-right: 5px;
-}
-
-.btn:focus {
-  outline: none;
-}
-
-.todo-container {
-  width: 600px;
-  margin: 0 auto;
-}
-.todo-container .todo-wrap {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+video{
+  width: 100%;
 }
 </style>
